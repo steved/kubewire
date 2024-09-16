@@ -22,10 +22,12 @@ KubeWire currently supports Linux and MacOS.
 
 KubeWire requires access to Kubernetes (by default; `~/.kube/config`) and a deployment or statefulset to proxy traffic for and through. 
 
-**Note*: `proxy` will modify the target resource in the cluster. Only execute the command in clusters where restoration is simple (e.g. with `helm`) or changes are not destructive.
+**Note**: `proxy` will modify the target resource in the cluster. Only execute the command in clusters where restoration is simple (e.g. with `helm`) or changes are not destructive.
+
+**Note**: `proxy` requires root access to modify network resources.
 
 ```
-$ kw proxy deploy/hello-world
+$ sudo -E kw proxy deploy/hello-world
 
 2024-09-16T12:33:33.403-0700	INFO	Waiting for load balancer to be ready	{"service": "wg-hello-world", "namespace": "default"}
 2024-09-16T12:33:36.316-0700	INFO	Load balancer ready, waiting for DNS to resolve	{"hostname": "example.elb.us-west-2.amazonaws.com"}
@@ -67,7 +69,7 @@ If the remote pod has direct access to the local host, the accessible address of
 For example, for minikube:
 ```
 $ ip=$(minikube ssh -- getent hosts host.minikube.internal | awk '{print $1}')
-$ kw proxy --local-address "$ip:19070" deploy/hello-world
+$ sudo -E kw proxy --local-address "$ip:19070" deploy/hello-world
 ```
 
 See [examples/minikube](./examples/minikube/README.md) for more information.
@@ -75,7 +77,7 @@ See [examples/minikube](./examples/minikube/README.md) for more information.
 If the remote pod is accessible to the internet through a NAT that supports Endpoint-Independent mapping, both the local and remote instances can attempt to discover their remote address, coordinate ports, and connect directly.
 For example, in AWS with a [NAT instance](https://fck-nat.dev) instead of a NAT gateway:
 ```
-$ kw proxy --direct deploy/hello-world
+$ sudo -E kw proxy --direct deploy/hello-world
 ```
 
 ### Limitations
