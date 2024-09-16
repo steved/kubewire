@@ -15,7 +15,7 @@ KubeWire currently supports Linux and MacOS.
 * Get the [latest release](https://github.com/steved/kubewire/releases/latest) for your operating system
 * Unpack and install the binary:
   ```
-  tar -C /usr/local/bin -xf kubewire.tar.gz kubewire
+  tar -C /usr/local/bin -xf kw.tar.gz kw
   ```
   
 ### Usage
