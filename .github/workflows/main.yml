@@ -40,7 +40,7 @@ jobs:
       - name: Unit test
         run: make test
 
-      - run: Check for git changes
+      - name: Check for git changes
         run: git diff --exit-code || { echo "Make sure to commit doc changes"; exit 1 }
 
   publish:
