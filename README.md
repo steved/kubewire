@@ -17,7 +17,7 @@ KubeWire currently supports Linux and MacOS.
   ```
   tar -C /usr/local/bin -xf kw.tar.gz kw
   ```
-  
+
 ### Usage
 
 KubeWire requires access to Kubernetes (by default; `~/.kube/config`) and a deployment or statefulset to proxy traffic for and through. 
@@ -122,6 +122,16 @@ peer: (hidden)
 ```
 
 If "latest handshake" isn't displayed or was a number of minutes ago, the connection may not be established.
+
+#### MacOS
+
+Local cleanup should be automatic once `kw` is stopped, but to manually cleanup DNS lookup changes:
+
+```
+sudo rm /etc/resolver/cluster.local
+sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist AlwaysAppendSearchDomains -bool false
+sudo killall mDNSResponder
+```
 
 ### Building from source
 
