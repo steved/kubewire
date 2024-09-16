@@ -1,0 +1,30 @@
+version: 2
+
+before:
+  hooks:
+    - make tidy
+
+builds:
+  - id: k8s-fwd
+    binary: k8s-fwd
+    ldflags:
+      - -s -w
+      - -X github.com/cerebrotech/k8s-fwd/pkg/config.Version={{ .Version }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}'
+
+changelog:
+  sort: asc
+
+release:
+  mode: replace
