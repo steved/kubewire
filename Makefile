@@ -11,7 +11,7 @@ endif
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 
-BIN ?= kubewire
+BIN ?= kw
 
 BIN_DIR ?= $(shell pwd)/.bin
 $(BIN_DIR):

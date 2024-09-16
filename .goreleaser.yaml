@@ -5,11 +5,11 @@ before:
     - make tidy
 
 builds:
-  - id: k8s-fwd
-    binary: k8s-fwd
+  - id: kw
+    binary: kw
     ldflags:
       - -s -w
-      - -X github.com/cerebrotech/k8s-fwd/pkg/config.Version={{ .Version }}
+      - -X github.com/steved/kubewire/pkg/config.Version={{ .Version }}
     env:
       - CGO_ENABLED=0
     goos:
