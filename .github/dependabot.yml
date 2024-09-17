@@ -4,6 +4,11 @@ updates:
     directory: /
     schedule:
       interval: daily
+    ignore:
+      # dependabot is unable to update non-released versions
+      # https://github.com/dependabot/dependabot-core/issues/2028
+      - dependency-name: "github.com/tailscale/wireguard-go"
+      - dependency-name: "golang.zx2c4.com/wireguard/wgctrl"
     groups:
       dependencies:
         patterns:
