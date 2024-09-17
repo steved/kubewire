@@ -32,7 +32,7 @@ test:
 
 .PHONY: docgen
 docgen:
-	rm -r ./docs/*
+	rm -rf ./docs/cli/*
 	$(GO) run main.go docgen
 
 ifeq (,$(shell command -v golangci-lint))

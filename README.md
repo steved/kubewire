@@ -20,7 +20,7 @@ KubeWire currently supports Linux and MacOS.
 
 ### Usage
 
-KubeWire requires access to Kubernetes (by default; `~/.kube/config`) and a deployment or statefulset to proxy traffic for and through. 
+KubeWire requires access to Kubernetes (by default; `~/.kube/config`) and a deployment or statefulset name to proxy traffic for and through. 
 
 **Note**: `proxy` will modify the target resource in the cluster. Only execute the command in clusters where restoration is simple (e.g. with `helm`) or changes are not destructive.
 
@@ -28,7 +28,6 @@ KubeWire requires access to Kubernetes (by default; `~/.kube/config`) and a depl
 
 ```
 $ sudo -E kw proxy deploy/hello-world
-
 2024-09-16T12:33:33.403-0700	INFO	Waiting for load balancer to be ready	{"service": "wg-hello-world", "namespace": "default"}
 2024-09-16T12:33:36.316-0700	INFO	Load balancer ready, waiting for DNS to resolve	{"hostname": "example.elb.us-west-2.amazonaws.com"}
 2024-09-16T12:36:16.521-0700	INFO	Kubernetes setup complete
@@ -39,8 +38,8 @@ $ sudo -E kw proxy deploy/hello-world
 
 Optional arguments allow targeting of namespaces (`-n`), containers (`-c`).
 
-When `proxy` exits, created Kubernetes resources such as services or network policies will not be deleted to allow for easier resumption of an existing session.
-Resources will be removed at exit with `--keep-resources=false` is passed.
+By default, when `proxy` exits, Kubernetes resources that were created, such as services or network policies, will not be deleted. This allows for easier resumption of an existing session.
+If `--keep-resources=false` is passed, resources will be removed at exit.
 
 Once connected, access Kubernetes cluster resources directly. Including the K8s API:
 ```
@@ -57,7 +56,7 @@ $ curl -k https://kubernetes.default
 }
 ```
 
-See [kw_proxy.md](./docs/kw_proxy.md) for detailed usage information.
+See [kw_proxy.md](./docs/cli/kw_proxy.md) for detailed usage information.
 
 #### Direct access
 
@@ -68,16 +67,16 @@ In environments where direct access is allowed from local host to remote pod or 
 If the remote pod has direct access to the local host, the accessible address of the local host can be passed to `proxy`.
 For example, for minikube:
 ```
-$ ip=$(minikube ssh -- getent hosts host.minikube.internal | awk '{print $1}')
-$ sudo -E kw proxy --local-address "$ip:19070" deploy/hello-world
+ip=$(minikube ssh -- getent hosts host.minikube.internal | awk '{print $1}')
+sudo -E kw proxy --local-address "$ip:19070" deploy/hello-world
 ```
 
-See [examples/minikube](./examples/minikube/README.md) for more information.
+See [docs/examples/minikube](./docs/examples/minikube/README.md) for more information.
 
 If the remote pod is accessible to the internet through a NAT that supports Endpoint-Independent mapping, both the local and remote instances can attempt to discover their remote address, coordinate ports, and connect directly.
 For example, in AWS with a [NAT instance](https://fck-nat.dev) instead of a NAT gateway:
 ```
-$ sudo -E kw proxy --direct deploy/hello-world
+sudo -E kw proxy --direct deploy/hello-world
 ```
 
 ### Limitations
@@ -123,9 +122,22 @@ peer: (hidden)
 
 If "latest handshake" isn't displayed or was a number of minutes ago, the connection may not be established.
 
+#### Debug logging
+
+Debug logging can be turned on with `-d`:
+```
+$ sudo -E .bin/kw proxy -d deploy/hello-world
+2024-09-17T14:58:21.473-0700	DEBUG	proxy/proxy.go:63	Starting Wireguard device setup
+2024-09-17T14:58:21.475-0700	DEBUG	wg/device_darwin.go:42	Routine: encryption worker 8 - started
+2024-09-17T14:58:21.475-0700	DEBUG	wg/device_darwin.go:42	Routine: decryption worker 7 - started
+2024-09-17T14:58:21.475-0700	DEBUG	wg/device_darwin.go:42	Routine: TUN reader - started
+2024-09-17T14:58:21.475-0700	DEBUG	wg/device_darwin.go:42	UAPI: Removing all peers
+[snip]
+```
+
 #### MacOS
 
-Local cleanup should be automatic once `kw` is stopped, but to manually cleanup DNS lookup changes:
+Local changes should be reset once `kw` exits. To manually cleanup DNS settings:
 
 ```
 sudo rm /etc/resolver/cluster.local
@@ -135,20 +147,20 @@ sudo killall mDNSResponder
 
 ### Building from source
 
-KubeWire support Go v1.23. In order to build KubeWire from source:
+KubeWire supports Go v1.23. In order to build from source:
 
 * Clone this repository
 * Build and run the executable:
   ```
   make build
-  .bin/kubewire
+  .bin/kw
   ```
 
 ## Why?
 
 ### Performance
 
-In limited testing in comparison to `mirrord`, `kw` is multiple times less latent.
+In limited testing in comparison to `mirrord`, `kw` has significant less latency.
 
 Setup:
 ```
@@ -177,7 +189,7 @@ tps = 24.885951 (without initial connection time)
 
 mirrord:
 ```
-$  mirrord exec -s '' -n default -t pod/hello-world-86cfdd5fc6-zqr75 --steal --fs-mode local -- /bin/sh -c "PGPASSWORD=mysupersecretpassword pgbench -h postgresql.default -U postgres -c 5 -j 10 -R 25 -T 30 testdb"
+$ mirrord exec -s '' -n default -t $(kubectl get po -l app.kubernetes.io/name=hello-world -oname) --steal --fs-mode local -- /bin/sh -c "PGPASSWORD=mysupersecretpassword pgbench -h postgresql.default -U postgres -c 5 -j 10 -R 25 -T 30 testdb"
 starting vacuum...end.
 transaction type: <builtin: TPC-B (sort of)>
 scaling factor: 1
@@ -196,7 +208,7 @@ tps = 24.910868 (without initial connection time)
 ### Similar projects
 
 * [k8s-insider](https://github.com/TrueGoric/k8s-insider) - no MacOS support
-* [kubetunnel](https://github.com/we-dcode/kubetunnel) - operates at the service level
+* [kubetunnel](https://github.com/we-dcode/kubetunnel) - operates at the service level, no Istio support
 * [mirrord](https://github.com/metalbear-co/mirrord/) - performance
 
 ## Contributing

@@ -22,7 +22,7 @@ func init() {
 		},
 	}
 
-	docgenCmd.Flags().StringVar(&docsPath, "out", "./docs/", "directory to write generated CLI documentation to")
+	docgenCmd.Flags().StringVar(&docsPath, "out", "./docs/cli/", "directory to write generated CLI documentation to")
 
 	rootCmd.AddCommand(docgenCmd)
 }

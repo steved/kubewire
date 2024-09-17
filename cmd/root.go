@@ -18,6 +18,7 @@ var rootCmd = &cobra.Command{
 	Short:             "KubeWire allows easy, direct connections to, and through, a Kubernetes cluster.",
 	SilenceUsage:      true,
 	DisableAutoGenTag: true,
+	CompletionOptions: cobra.CompletionOptions{HiddenDefaultCmd: true},
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		config := zap.Config{
 			Level:             zap.NewAtomicLevelAt(zap.InfoLevel),
