@@ -1,6 +1,7 @@
 module github.com/steved/kubewire
 
-go 1.23.0
+go 1.23.1
+
 toolchain go1.23.3
 
 require (
